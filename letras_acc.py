@@ -58,14 +58,34 @@ letter_counts_df = letter_counts_df.sort_values(by='normalized', ascending=False
 indeces_to_remove = [27, 26, 29, 30]
 letter_counts_df = letter_counts_df.drop(indeces_to_remove)
 letter_counts_df = letter_counts_df.reset_index(drop=True)
-"""print(letter_counts_df)"""
 
-#We generate a string of 10 letters (in this case we use the dataframe and take the column that has the weights to make it so that its less likely 
+#Create a dataframe for vowels and another one for consonants
+vowel_indeces = [0, 1, 3, 4, 10]
+vowels_df = letter_counts_df.loc[vowel_indeces] #Maintain only the vowels in the dataframe
+vowels_df = vowels_df.reset_index(drop=True) #Reset index
+consonants_df = letter_counts_df.drop(vowel_indeces) #Drop the vowels
+consonants_df = consonants_df.reset_index(drop=True)
+
+"""#We generate a list of 10 letters (in this case we use the dataframe and take the column that has the weights to make it so that its less likely 
 #to get a string of 10 weird consonants)
-random_string = ''.join(random.choices(letter_counts_df['letter'], weights=letter_counts_df['normalized'], k=10))
+random_string = ''.join(random.choices(letter_counts_df['letter'], weights=letter_counts_df['normalized'], k=10))"""
+
+#Asking the player for a 10 letter string
+random_string=""
+while (len(random_string) < 10): #loop until the string is 10 letters long
+    desired_letter = input("¿Quiere una vocal o una consonante?(v/c)") #We ask for vowels or consonants to the player
+    if desired_letter == 'v':
+        random_string += random.choices(vowels_df['letter'], weights=vowels_df['normalized'], k=1)[0]#The [0] at the end is because rando.choices generates a list
+        #But for concatenation we would need str values, so we choose the first element of the list that happens to be a str
+        print(random_string)
+    elif desired_letter == 'c':
+        random_string += random.choices(consonants_df['letter'], weights=consonants_df['normalized'], k=1)[0] 
+        print(random_string)
+    else:
+        print("\nSi quiere una vocal teclee v, si quiere una consonante teclee c.")
 
 #We print the random weighted string
-print("Estas son tus 10 letras con las que hacer una palabra, tienes 1 minuto: ", random_string)
+print("\nEstas son tus 10 letras con las que hacer una palabra, tienes 1 minuto: ", random_string)
 
 #Now we need to find the longest word that can be made with those letters
 
@@ -122,7 +142,7 @@ def validate_user_input(user_input, word_list):
 is_valid, message = validate_user_input(user_input, filtered_words)
 
 if is_valid:
-    print(message, user_input)
+    print(message)
 else:
     print(message)
 
