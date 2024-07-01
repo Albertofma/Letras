@@ -5,6 +5,7 @@ from collections import Counter, defaultdict
 from itertools import combinations #For obtaining all permutations for a 10 letter set
 import threading  # For creating the timer
 import time  # For the sleep function
+import os #For terminating the program
 
 # Define the file path
 file_path = 'palabras.txt'
@@ -83,19 +84,26 @@ def find_longest_word(letters, word_list):
 #Use the longest word function
 longest_word = find_longest_word(random_string, filtered_words)
 
+# Event to signal input received
+input_event = threading.Event()
+
 # Timer function
 def timer():
-    time.sleep(60)  # Wait for 60 seconds
-    print("\nTiempo terminado! La palabra mas larga era: ", longest_word)
-    exit()
+    if not input_event.wait(60):  # Wait for 60 seconds or until the event is set
+        print("\nTiempo terminado! Juego terminado.")
+        os._exit(1) #Force the program to exit in the case that the player hasnt submitted anything
 
 # Start the timer thread
-timer_thread = threading.Thread(target=timer)
-timer_thread.start()
-
+timer_thread = threading.Thread(target=timer) #Create a thread object, timer is target function that will run in the new thread
+timer_thread.start() #Start it with the start method
 
 # Ask the user for input
-user_input = input("Introduzca la palabra mas larga que haya encontrado : ")
+try:
+    user_input = input("Introduzca la palabra más larga que haya encontrado : ")
+    input_event.set()  # Set the event when input is received
+except KeyboardInterrupt: #To catch the case where the user does ctrl+c
+    print("\nJuego abortado.")
+    exit()
 
 user_input = replace_accented_letters(user_input)#Make lowercase then change accents to compare with list that we have
 
